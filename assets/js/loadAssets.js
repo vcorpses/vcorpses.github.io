@@ -38,10 +38,10 @@ async function fetchAvatarsForAll() {
 
 async function fetchAndSetAvatar(imgElement, userId) {
     try {
-        let response = await fetch(`https://api.wxrn.lol/api/avatar/${userId}`);
+        let response = await fetch(`https://api.wxrn.lol/api/discord/${userId}`);
 
         if (!response.ok) {
-            response = await fetch(`https://cors-anywhere.herokuapp.com/https://185.228.81.59:3000/api/avatar/${userId}`);
+            response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.wxrn.lol/api/discord/${userId}`);
         }
 
         const data = await response.json();
