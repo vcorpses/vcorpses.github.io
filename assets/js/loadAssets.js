@@ -5,7 +5,7 @@ async function fetchAvatarsForAll() {
     const liElements = document.querySelectorAll('#popup li');
 
     // Set avatar and banner for the main user (with the specified Discord ID)
-    const discordId = '1158429903629336646'; // Main user's Discord ID
+    const discordId = '965966696751955988'; // Main user's Discord ID
     const avatarElement = document.querySelector('#dc-pfp');
     const faviconElement = document.querySelector('#short-icon');
 
