@@ -3,16 +3,24 @@ const colorThief = new ColorThief();
 
 async function fetchAvatarsForAll() {
     const liElements = document.querySelectorAll('#popup li');
-    const myUserId = '965966696751955988';
-    const myAvatarElement = document.querySelector('#dc-pfp');
+
+    // Set avatar and banner for the main user (with the specified Discord ID)
+    const discordId = '1158429903629336646'; // Main user's Discord ID
+    const avatarElement = document.querySelector('#dc-pfp');
     const faviconElement = document.querySelector('#short-icon');
 
-    if (myAvatarElement) {
-        myAvatarElement.src = "assets/img/black.png"; // Placeholder while fetching
-        const avatarUrl = await fetchAndSetAvatar(myAvatarElement, myUserId);
+    if (avatarElement) {
+        avatarElement.src = "assets/img/black.png"; // Placeholder while fetching
+        const resData = await fetchImages(avatarElement, discordId);
 
-        if (avatarUrl && faviconElement) {
-            faviconElement.href = avatarUrl;
+        if (resData && resData.bannerUrl) {
+            document.body.style.backgroundImage = `url(${resData.bannerUrl + "?size=1024"})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+        }
+
+        if (resData && resData.avatarUrl && faviconElement) {
+            faviconElement.href = resData.avatarUrl;
         } else if (!faviconElement) {
             console.error('No element with id="short-icon" found.');
         }
@@ -28,7 +36,7 @@ async function fetchAvatarsForAll() {
             imgElement.src = "assets/img/black.png"; // Placeholder while fetching
 
             if (userId) {
-                await fetchAndSetAvatar(imgElement, userId);
+                await fetchImages(imgElement, userId);
             } else {
                 console.error('No Discord User ID found in the alt attribute.');
             }
@@ -36,10 +44,11 @@ async function fetchAvatarsForAll() {
     }
 }
 
-async function fetchAndSetAvatar(imgElement, userId) {
+async function fetchImages(imgElement, userId) {
     try {
         let response = await fetch(`https://api.wxrn.lol/api/discord/${userId}`);
 
+        // Fallback fetch in case of failure with the primary URL
         if (!response.ok) {
             response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.wxrn.lol/api/discord/${userId}`);
         }
@@ -47,24 +56,28 @@ async function fetchAndSetAvatar(imgElement, userId) {
         const data = await response.json();
 
         if (data.avatarUrl) {
+            // Set the avatar URL for the img element
             imgElement.src = data.avatarUrl;
 
-            return new Promise((resolve, reject) => {
+            // Return a promise to handle the image load
+            const avatarPromise = new Promise((resolve, reject) => {
                 imgElement.onload = () => {
-                    applyColorsFromImage(imgElement); // Call color extraction function
-                    resolve(data.avatarUrl); // Resolve the promise with the URL
+                    applyColorsFromImage(imgElement);
+                    resolve(data); // Resolve with the full data object (avatar and banner URLs)
                 };
 
                 imgElement.onerror = () => {
-                    console.error(`Failed to load image for user ${userId}`);
-                    reject(new Error(`Image failed to load for user ${userId}`));
+                    console.error(`Failed to load avatar image for user ${userId}`);
+                    reject(new Error(`Avatar image failed to load for user ${userId}`));
                 };
             });
+
+            return avatarPromise; // Resolve the promise with the data
         } else if (data.error) {
             console.error(`Error for user ${userId}: ${data.error}`);
         }
     } catch (error) {
-        console.error(`Failed to fetch avatar for user ${userId}:`, error);
+        console.error(`Failed to fetch avatar and banner for user ${userId}:`, error);
     }
 
     return null; // Return null if there was an error
