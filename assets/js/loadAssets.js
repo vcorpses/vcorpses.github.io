@@ -4,13 +4,12 @@ const colorThief = new ColorThief();
 async function fetchAvatarsForAll() {
     const liElements = document.querySelectorAll('#popup li');
 
-    // Set avatar and banner for the main user (with the specified Discord ID)
-    const discordId = '965966696751955988'; // Main user's Discord ID
+    const discordId = '965966696751955988';
     const avatarElement = document.querySelector('#dc-pfp');
     const faviconElement = document.querySelector('#short-icon');
 
     if (avatarElement) {
-        avatarElement.src = "assets/img/black.png"; // Placeholder while fetching
+        avatarElement.src = "assets/img/black.png";
         const resData = await fetchImages(avatarElement, discordId);
 
         if (resData && resData.bannerUrl) {
@@ -33,7 +32,7 @@ async function fetchAvatarsForAll() {
 
         if (imgElement) {
             const userId = imgElement.alt;
-            imgElement.src = "assets/img/black.png"; // Placeholder while fetching
+            imgElement.src = "assets/img/black.png";
 
             if (userId) {
                 await fetchImages(imgElement, userId);
@@ -48,7 +47,6 @@ async function fetchImages(imgElement, userId) {
     try {
         let response = await fetch(`https://api.wxrn.lol/api/discord/${userId}`);
 
-        // Fallback fetch in case of failure with the primary URL
         if (!response.ok) {
             response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.wxrn.lol/api/discord/${userId}`);
         }
